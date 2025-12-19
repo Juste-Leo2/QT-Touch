@@ -25,7 +25,7 @@ Pour garantir une détection précise, nous appliquons la chaîne de traitement 
 Le modèle a été conçu pour être léger et efficace pour une exécution en temps réel.
 
 <p align="center">
-  <img src="docs/arch.png" alt="Architecture du modèle" width="600">
+  <img src="docs/arch.png" alt="Architecture du modèle" width="400">
 </p>
 
 ### Détails de l'entraînement
