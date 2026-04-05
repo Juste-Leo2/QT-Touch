@@ -1,85 +1,108 @@
-# 🍓 Guide d'Inférence sur Raspberry Pi
+# 🍓 Raspberry Pi Inference Guide
 
-Ce guide détaille les étapes nécessaires pour configurer le matériel et l'environnement logiciel afin d'exécuter l'inférence du modèle sur Raspberry Pi.
+[🇨🇵 Français](README_FR.md) | [🇬🇧 English](README.md)
+
+This guide details the steps necessary to configure the hardware and software environment to run the model inference on the Raspberry Pi.
 
 ---
 
-## 🛠 Matériel (Hardware)
+## 🛠 Hardware
 
-### 1. Branchement du MCP3008
-Le MCP3008 est utilisé pour la conversion analogique-numérique (notamment pour le capteur du torse droit). 
+**Note:** This configuration is specifically designed for a portion of the vest, more precisely the **robot's right torso**.
 
-![puce MCP](../docs/MCP3008.jpg)
+### 1. MCP3008 Wiring
+The MCP3008 is used for analog-to-digital conversion (especially for the right torso sensor).
 
-**Schéma de câblage :**
+![MCP chip](../docs/MCP3008.jpg)
 
-Assurez-vous que l'alimentation et les broches de données sont correctement connectées aux GPIO du Raspberry Pi :
+**Wiring diagram:**
 
-| Broche MCP3008 | Broche Raspberry Pi | Fonction |
+Ensure the power and data pins are properly connected to the Raspberry Pi GPIOs:
+
+| MCP3008 Pin | Raspberry Pi Pin | Function |
 | :--- | :--- | :--- |
-| **VDD** | Pin 1 ou 17 (3.3V) | Alimentation positive |
-| **VREF** | Pin 1 ou 17 (3.3V) | Tension de référence |
-| **AGND** | Pin 6, 9... (GND) | Masse analogique |
-| **DGND** | Pin 6, 9... (GND) | Masse numérique |
-| **CLK** | GPIO 12 | Horloge |
+| **VDD** | Pin 1 or 17 (3.3V) | Positive Power Supply |
+| **VREF** | Pin 1 or 17 (3.3V) | Reference Voltage |
+| **AGND** | Pin 6, 9... (GND) | Analog Ground |
+| **DGND** | Pin 6, 9... (GND) | Digital Ground |
+| **CLK** | GPIO 12 | Clock |
 | **DOUT** | GPIO 16 | MISO (Master In Slave Out) |
 | **DIN** | GPIO 20 | MOSI (Master Out Slave In) |
 | **CS/SHDN** | GPIO 21 | Chip Select |
 
-### 2. Montage de la veste
-Pour le branchement des capteurs de la veste, une résistance de **47 kΩ** est requise pour assurer la stabilité des mesures.
+### 2. Vest Assembly
+To connect the vest sensors (piezo-resistive sensor), a **47 kΩ** resistor is required to ensure measurement stability. 
+**Attention:** for the piezo-resistive sensor, you must imperatively use the clips with a "P" as the initial.
 
-![schéma électrique](../docs/schema_elec.png)
+![electrical schematic](../docs/schema_elec.png)
 
 ---
 
-## 💻 Logiciel (Software)
+## 💻 Software
 
-### 1. Prérequis
-* Un Raspberry Pi avec un système d'exploitation installé (Raspberry Pi OS recommandé).
-* Une connexion internet active.
+### 1. Prerequisites
+* A Raspberry Pi with an installed operating system (Raspberry Pi OS recommended).
+* An active internet connection.
 
-### 2. Mise à jour du système
-Commencez par mettre à jour votre système et installez les bibliothèques nécessaires à la gestion des ports GPIO :
+### 2. System Update
+Start by updating your system and installing the necessary libraries for GPIO port management:
 
 ```bash
 sudo apt update && sudo apt full-upgrade -y
 sudo apt install python3-gpiozero python3-lgpio -y
 ```
 
-### 3. Installation du gestionnaire de paquets `uv`
-Nous utilisons **uv**, un gestionnaire de dépendances Python extrêmement rapide, pour gérer notre environnement virtuel.
+### 3. Installing `uv` Package Manager
+We use **uv**, an extremely fast Python dependency manager, to manage our virtual environment.
 
 ```bash
-# Installation de uv
+# Install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# (Optionnel) Redémarrez votre terminal ou sourcez votre profil pour activer 'uv' dans le PATH
+# (Optional) Restart your terminal or source your profile to enable 'uv' in PATH
 source $HOME/.cargo/env
 ```
 
-### 4. Clonage et Préparation du Projet
-Le modèle d'inférence est déjà inclus dans le dépôt.
+### 4. Cloning and Project Preparation
+The inference model is already included in the repository.
 
 ```bash
-# Récupération du projet
+# Clone the repository
 git clone https://github.com/Juste-Leo2/QT-Touch.git
 cd QT-Touch/raspberry_inference
 
-# Création de l'environnement virtuel avec Python 3.11
+# Create the virtual environment with Python 3.11
 uv venv -p 3.11
 source .venv/bin/activate
 
-# Installation des dépendances
+# Install dependencies
 uv pip install -r requirements_rpi.txt
 ```
 
-### 5. Exécution de l'inférence
-Une fois l'environnement prêt, lancez le script d'inférence :
+### 5. Running Inference
+Once the environment is ready, run the inference script:
 
 ```bash
 uv run inference.py
 ```
 
+### 6. Inference linked with the QTRobot-Interaction project
+If you are using this code within the [QTRobot-Interaction](https://github.com/Juste-Leo2/QTRobot-Interaction) project, the setup process follows the same steps (1 to 5).
+
+The only difference lies in the `RaspberryManager` class configuration executed within the `main.py` file of the other repository (`QTRobot-Interaction`). Here you'll need to adapt it to the Raspberry Pi in question with the correct path:
+
+```python
+        # Config Raspberry Pi pour la veste
+        print("\n🧤 Initialisation Raspberry Pi (veste)...")
+        raspberry = RaspberryManager(
+            ip="192.168.100.3",        # IP du Raspberry
+            user="qt",
+            password="qtrobot",
+            script_path="/home/.../QT-Touch_raspberry_inference/inferenceQT0526.py",
+            venv_path="/home/.../QT-Touch_raspberry_inference/.venv/bin/activate",
+            port=65432
+        )
+```
+
 ---
-*Note : Assurez-vous que l'interface SPI est activée sur votre Raspberry Pi via `sudo raspi-config` (Interface Options > SPI).*
+*Note: Ensure the SPI interface is enabled on your Raspberry Pi via `sudo raspi-config` (Interface Options > SPI).*
