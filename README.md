@@ -1,5 +1,8 @@
 # QT-Touch 🤖🧤
 
+> [!NOTE]
+> **Project continuation:** This project has been extended with new sensors on the jacket. Check out the follow-up here: [**QT-jacket**](https://github.com/Juste-Leo2/QT-jacket)
+
 [🇨🇵 Français](docs/README_FR.md) | [🇬🇧 English](README.md)
 
 **Machine learning-based tactile recognition for the QT robot.**

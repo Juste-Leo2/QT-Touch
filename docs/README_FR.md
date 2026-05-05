@@ -1,5 +1,8 @@
 # QT-Touch 🤖🧤
 
+> [!NOTE]
+> **Ce projet a une suite !** L'extension avec les capteurs de la veste est disponible sur ce repo : [**QT-jacket**](https://github.com/Juste-Leo2/QT-jacket)
+
 [🇨🇵 Français](README_FR.md) | [🇬🇧 English](../README.md)
 
 **Reconnaissance tactile par apprentissage automatique pour le robot QT.**
